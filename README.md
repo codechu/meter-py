@@ -6,6 +6,11 @@
         '-----'          ─── tick · tock · tick · tock ───
 ```
 
+[![PyPI](https://img.shields.io/pypi/v/codechu-meter.svg)](https://pypi.org/project/codechu-meter/)
+[![Python](https://img.shields.io/pypi/pyversions/codechu-meter.svg)](https://pypi.org/project/codechu-meter/)
+[![CI](https://github.com/codechu/meter-py/actions/workflows/ci.yml/badge.svg)](https://github.com/codechu/meter-py/actions/workflows/ci.yml)
+[![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
 > *Stopwatch, rolling-rate, and ETA — time things without lying about them.*
 
 # codechu-meter
@@ -195,6 +200,32 @@ Coverage gate: ≥90 %. Tests drive time via monkeypatching
 - [Recipes](docs/RECIPES.md) — patterns for timing blocks, tracking
   download speed, computing ETA, tuning EMA `alpha`, and pairing with
   `codechu-fmt`.
+
+## Codechu family
+
+Companion libraries from the Codechu Python ecosystem:
+
+| Library | Purpose |
+|---------|---------|
+| [codechu-fmt](https://pypi.org/project/codechu-fmt/) | Human-readable formatting — sizes, durations, rates, percent |
+| [codechu-spark](https://pypi.org/project/codechu-spark/) | Unicode sparklines, mini bar charts, heatmaps |
+| [codechu-cli](https://pypi.org/project/codechu-cli/) | CLI primitives — colors, progress, spinners, prompts, table |
+| [codechu-events](https://pypi.org/project/codechu-events/) | Thread-safe multi-channel pub/sub bus with replay |
+| [codechu-xdg](https://pypi.org/project/codechu-xdg/) | XDG Base Directory helpers, vendor-namespaced |
+| [codechu-treeviz](https://pypi.org/project/codechu-treeviz/) | Tree visualization — treemap, sunburst, icicle, flame |
+| [codechu-fs](https://pypi.org/project/codechu-fs/) | Filesystem primitives — atomic write, XDG trash, safe walk |
+| [codechu-term](https://pypi.org/project/codechu-term/) | Terminal capability detection, alt buffer, raw mode |
+| [codechu-color](https://pypi.org/project/codechu-color/) | Color palettes, WCAG contrast, color-blind variants |
+| [codechu-treedata](https://pypi.org/project/codechu-treedata/) | N-ary tree data structures and algorithms |
+| [codechu-log](https://pypi.org/project/codechu-log/) | Structured logging — context, JSON, rotation, redaction |
+| [codechu-i18n](https://pypi.org/project/codechu-i18n/) | Internationalization — locale, plural rules, RTL |
+| [codechu-ipc](https://pypi.org/project/codechu-ipc/) | Local IPC — Unix socket, FIFO, JSON-line protocol |
+| [codechu-config](https://pypi.org/project/codechu-config/) | Schema-driven config — atomic save, migrations |
+
+## Credits
+
+- Reservoir sampling per Jeffrey Vitter, "Random Sampling with a Reservoir" (1985)
+- EMA convention follows standard exponential smoothing literature
 
 ## License
 
