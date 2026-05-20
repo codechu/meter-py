@@ -1,13 +1,14 @@
-# codechu-meter
-
 ```text
-   ___          _           _
-  / __\___   __| | ___  ___| |__  _   _
- / /  / _ \ / _\` |/ _ \/ __| '_ \| | | |
-/ /__| (_) | (_| |  __/ (__| | | | |_| |
-\____/\___/ \__,_|\___|\___|_| |_|\__,_|
+        .--:--.          c o d e c h u
+       /  12   \           ╔═════════╗
+      |9   ●---3|  meter   ║ 00:42.7 ║   ETA  03:18
+       \   6   /           ╚═════════╝
+        '-----'          ─── tick · tock · tick · tock ───
 ```
 
+> *Stopwatch, rolling-rate, and ETA — time things without lying about them.*
+
+# codechu-meter
 
 Stdlib-only measurement primitives — stopwatch, rolling-window rate
 estimator, ETA predictor — extracted from the [Disk Cleaner](https://github.com/codechu/disk-cleaner)
