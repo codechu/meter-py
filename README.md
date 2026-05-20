@@ -85,6 +85,68 @@ higher values weight recent samples more heavily.
 `eta()` returns `None` until at least two updates with measurable
 elapsed time and positive progress.
 
+### `Counter` *(v0.3.0+)*
+
+Thread-safe int counter. `inc` / `dec` / `reset` / `.value` are all
+guarded by a `threading.Lock`.
+
+```python
+from codechu_meter import Counter
+
+inflight = Counter()
+inflight.inc()
+try:
+    serve(req)
+finally:
+    inflight.dec()
+print(inflight.value)
+```
+
+### `Histogram` *(v0.3.0+)*
+
+Bucketed distribution counter. Upper edges are inclusive; values
+above the largest edge fall into a `math.inf` overflow bucket.
+Thread-safe.
+
+```python
+from codechu_meter import Histogram
+
+hist = Histogram([0.01, 0.05, 0.1, 0.5, 1.0])
+for r in requests:
+    hist.observe(r.latency_seconds)
+print(hist.counts, hist.total)
+```
+
+### `PercentileEstimator` *(v0.3.0+)*
+
+Streaming p50 / p95 / p99 via Vitter's reservoir sampling
+(`max_samples` capped). Pure stdlib — no numpy. Thread-safe.
+
+```python
+from codechu_meter import PercentileEstimator
+
+pe = PercentileEstimator(max_samples=5_000)
+for r in requests:
+    pe.observe(r.latency_seconds)
+print(pe.p50, pe.p95, pe.p99)
+```
+
+### `Stopwatch` named sections *(v0.3.0+)*
+
+`Stopwatch.section(name)` accumulates sub-timings into
+`Stopwatch.sections`. Same name re-entered → values add. Not
+thread-safe; use one Stopwatch per thread.
+
+```python
+sw = Stopwatch().start()
+with sw.section("parse"):
+    parse(buf)
+with sw.section("emit"):
+    emit(result)
+sw.stop()
+print(sw.sections)  # → {"parse": 0.012, "emit": 0.004}
+```
+
 ## Design
 
 - **Zero dependencies.** Stdlib only.

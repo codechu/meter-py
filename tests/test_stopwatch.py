@@ -80,3 +80,92 @@ def test_stop_without_start_is_noop(monkeypatch):
 def test_no_str_format_coupling():
     # v0.2.0: Stopwatch has no __str__ override — uses object default.
     assert "Stopwatch" in str(Stopwatch())
+
+
+# --- v0.3.0: named sections ---
+
+
+def test_sections_initially_empty():
+    sw = Stopwatch()
+    assert sw.sections == {}
+
+
+def test_section_records_elapsed(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    with sw.section("parse"):
+        clock.advance(0.5)
+    assert sw.sections == {"parse": 0.5}
+
+
+def test_section_accumulates(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    with sw.section("io"):
+        clock.advance(1.0)
+    with sw.section("io"):
+        clock.advance(2.0)
+    assert sw.sections["io"] == 3.0
+
+
+def test_section_sequential(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    with sw.section("a"):
+        clock.advance(1.0)
+    with sw.section("b"):
+        clock.advance(2.0)
+    assert sw.sections == {"a": 1.0, "b": 2.0}
+
+
+def test_section_nested(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    with sw.section("outer"):
+        clock.advance(1.0)
+        with sw.section("inner"):
+            clock.advance(2.0)
+        clock.advance(0.5)
+    # outer measures wall time including inner: 1.0 + 2.0 + 0.5 = 3.5
+    assert sw.sections["outer"] == 3.5
+    assert sw.sections["inner"] == 2.0
+
+
+def test_section_records_even_on_exception(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    try:
+        with sw.section("risky"):
+            clock.advance(0.25)
+            raise RuntimeError("boom")
+    except RuntimeError:
+        pass
+    assert sw.sections == {"risky": 0.25}
+
+
+def test_start_clears_sections(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    with sw.section("a"):
+        clock.advance(1.0)
+    sw.start()
+    assert sw.sections == {}
+
+
+def test_section_independent_of_elapsed(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch().start()
+    clock.advance(10.0)  # untracked
+    with sw.section("part"):
+        clock.advance(1.0)
+    clock.advance(10.0)  # untracked
+    sw.stop()
+    assert sw.elapsed == 21.0
+    assert sw.sections == {"part": 1.0}

@@ -32,6 +32,17 @@ def test_window_floor():
     assert re.window_seconds == 1e-6
 
 
+def test_window_negative_clamped():
+    re = RateEstimator(window_seconds=-5.0)
+    assert re.window_seconds == 1e-6
+
+
+def test_window_nan_clamped():
+    # Bug fix v0.3.0: max(1e-6, nan) returned nan; now clamps to floor.
+    re = RateEstimator(window_seconds=float("nan"))
+    assert re.window_seconds == 1e-6
+
+
 def test_single_observation(monkeypatch):
     clock = _FakeClock()
     _patch(monkeypatch, clock)

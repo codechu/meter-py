@@ -4,6 +4,27 @@
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-05-20
+
+### Added
+- `Counter` — thread-safe `inc` / `dec` / `reset` int counter
+  (`threading.Lock` guarded).
+- `Histogram(buckets)` — bucketed distribution counter with inclusive
+  upper edges and a `math.inf` overflow bucket. Thread-safe.
+- `PercentileEstimator(max_samples)` — streaming p50 / p95 / p99 via
+  Vitter's reservoir sampling (algorithm R). Pure stdlib, no numpy.
+  Thread-safe.
+- `Stopwatch.section(name)` — context-manager API for accumulating
+  named sub-timings into `Stopwatch.sections: dict[str, float]`.
+  Same-named sections add; nesting works; sections are independent
+  of `Stopwatch.elapsed`. Documented as **not thread-safe** — use
+  one Stopwatch per thread.
+
+### Fixed
+- `RateEstimator(window_seconds=...)` clamp also handles NaN and
+  negative inputs: previously `max(1e-6, nan) → nan`, now both clamp
+  to the `1e-6` floor.
+
 ## [0.2.0] — 2026-05-20
 
 ### Changed (breaking)

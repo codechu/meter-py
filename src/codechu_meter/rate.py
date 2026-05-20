@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import math
 import time
 from collections import deque
 from typing import Deque
@@ -21,7 +22,11 @@ class RateEstimator:
     """
 
     def __init__(self, window_seconds: float = 1.0, *, unit: str = "items") -> None:
-        self.window_seconds = max(1e-6, float(window_seconds))
+        w = float(window_seconds)
+        # NaN propagates through max(); fall back to floor explicitly.
+        if math.isnan(w) or w < 1e-6:
+            w = 1e-6
+        self.window_seconds = w
         self.unit = unit
         self._samples: Deque[tuple[float, float]] = deque()
 
