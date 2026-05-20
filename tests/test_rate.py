@@ -25,7 +25,6 @@ def test_empty(monkeypatch):
     _patch(monkeypatch, _FakeClock())
     re = RateEstimator()
     assert re.rate() == 0.0
-    assert str(re) == "0.0/s"
 
 
 def test_window_floor():
@@ -61,12 +60,8 @@ def test_window_evicts_old(monkeypatch):
     re.observe(100)
     clock.advance(2.0)  # past window
     re.observe(5)
-    # Old observation should be dropped.
     r = re.rate()
-    # only the second sample counts; span snaps to floor
     assert r > 0
-    # Definitely less than the 100/s implied by the first obs.
-    assert r < 1e6 or True  # smoke: just ensure no crash
 
 
 def test_reset(monkeypatch):
@@ -78,23 +73,11 @@ def test_reset(monkeypatch):
     assert re.rate() == 0.0
 
 
-def test_str_uses_format_rate(monkeypatch):
-    clock = _FakeClock()
-    _patch(monkeypatch, clock)
-    re = RateEstimator(window_seconds=2.0)
-    re.observe(20)
-    clock.advance(1.0)
-    re.observe(20)
-    s = str(re)
-    assert s.endswith("/s")
+def test_unit_attribute():
+    re = RateEstimator(unit="bytes")
+    assert re.unit == "bytes"
 
 
-def test_str_bytes_unit(monkeypatch):
-    clock = _FakeClock()
-    _patch(monkeypatch, clock)
-    re = RateEstimator(window_seconds=2.0, unit="bytes")
-    re.observe(1024)
-    clock.advance(1.0)
-    re.observe(1024)
-    s = str(re)
-    assert s.endswith("B/s")
+def test_no_str_format_coupling():
+    # v0.2.0: RateEstimator has no __str__ override.
+    assert "RateEstimator" in str(RateEstimator())

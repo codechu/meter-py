@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "codechu-meter"
-version = "0.1.0"
+version = "0.2.0"
 description = "Stdlib-only measurement primitives — stopwatch, rate estimation, ETA prediction."
 readme = "README.md"
 license = { file = "LICENSE" }
@@ -23,9 +23,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Topic :: Software Development :: Libraries",
 ]
-dependencies = [
-    "codechu-fmt>=0.1,<0.2",
-]
+dependencies = []
 
 [project.optional-dependencies]
 dev = ["pytest>=7.0", "pytest-cov>=4.1", "ruff>=0.4"]

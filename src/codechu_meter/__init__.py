@@ -13,7 +13,7 @@ from .eta import ETAEstimator
 from .rate import RateEstimator
 from .stopwatch import Stopwatch
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 __all__ = [
     "ETAEstimator",

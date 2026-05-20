@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import time
 
-from codechu_fmt import format_duration
-
 __all__ = ["Stopwatch"]
 
 
@@ -16,13 +14,15 @@ class Stopwatch:
 
         with Stopwatch() as sw:
             do_work()
-        print(sw)          # → '1m 30s' (via codechu_fmt.format_duration)
-        print(sw.elapsed)  # → float seconds
+        sw.elapsed  # → float seconds
 
         sw = Stopwatch().start()
         ...
         sw.stop()
         sw.elapsed
+
+    Formatting is the caller's responsibility (e.g.
+    ``codechu_fmt.format_duration(sw.elapsed)``).
     """
 
     def __init__(self) -> None:
@@ -48,10 +48,3 @@ class Stopwatch:
 
     def __exit__(self, exc_type, exc, tb) -> None:
         self.stop()
-
-    def __str__(self) -> str:
-        # Use the running elapsed when active; the captured elapsed
-        # otherwise. The captured value is 0.0 before start().
-        if self.started_at is not None and self._stopped_at is None:
-            return format_duration(time.monotonic() - self.started_at)
-        return format_duration(self.elapsed)

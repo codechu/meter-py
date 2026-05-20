@@ -4,6 +4,19 @@
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-05-20
+
+### Changed (breaking)
+- Removed `__str__` from `Stopwatch`, `RateEstimator`, and
+  `ETAEstimator`. Callers must format explicitly (e.g. via
+  `codechu_fmt.format_duration(sw.elapsed)`).
+- Dropped the `codechu-fmt` dependency — `codechu-meter` is now
+  zero-dependency.
+
+### Added
+- `ETAEstimator(..., alpha=0.3)` — configurable EMA smoothing factor
+  (previously hardcoded to `0.3`).
+
 ## [0.1.0] — 2026-05-20
 
 ### Added

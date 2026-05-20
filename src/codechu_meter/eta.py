@@ -4,8 +4,6 @@ from __future__ import annotations
 
 import time
 
-from codechu_fmt import format_duration
-
 __all__ = ["ETAEstimator"]
 
 
@@ -17,20 +15,29 @@ class ETAEstimator:
 
     ``mode='ema'`` blends an exponential moving average of recent
     throughput with the linear estimate for smoother numbers on
-    bursty workloads.
+    bursty workloads. The smoothing factor ``alpha`` (0 < alpha <= 1)
+    controls how reactive the EMA is; higher values weight recent
+    samples more heavily.
 
     Returns ``None`` until at least two updates with measurable
     elapsed time and positive progress.
 
-    ``__str__`` renders via :func:`codechu_fmt.format_duration`, or
-    ``'?'`` if no estimate is available yet.
+    Formatting is the caller's responsibility (e.g.
+    ``codechu_fmt.format_duration(eta.eta())``).
     """
 
-    def __init__(self, total: float, mode: str = "linear") -> None:
+    def __init__(
+        self,
+        total: float,
+        mode: str = "linear",
+        *,
+        alpha: float = 0.3,
+    ) -> None:
         if mode not in ("linear", "ema"):
             raise ValueError(f"unknown mode {mode!r}")
         self.total = float(total)
         self.mode = mode
+        self.alpha = float(alpha)
         self._t_start = time.monotonic()
         self._last_t: float | None = None
         self._last_current: float = 0.0
@@ -48,8 +55,7 @@ class ETAEstimator:
                 if self._ema_rate is None:
                     self._ema_rate = inst
                 else:
-                    # alpha=0.3 — smooths noise without lagging too far
-                    self._ema_rate = 0.3 * inst + 0.7 * self._ema_rate
+                    self._ema_rate = self.alpha * inst + (1.0 - self.alpha) * self._ema_rate
         self._last_t = now
         self._last_current = current
         self._current = current
@@ -80,9 +86,3 @@ class ETAEstimator:
         self._current = 0.0
         self._ema_rate = None
         self._updates = 0
-
-    def __str__(self) -> str:
-        v = self.eta()
-        if v is None:
-            return "?"
-        return format_duration(v)

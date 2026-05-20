@@ -21,13 +21,12 @@ def _patch(monkeypatch, clock):
     monkeypatch.setattr(sw_mod.time, "monotonic", clock)
 
 
-def test_str_before_start(monkeypatch):
+def test_initial_state(monkeypatch):
     clock = _FakeClock()
     _patch(monkeypatch, clock)
     sw = Stopwatch()
     assert sw.elapsed == 0.0
-    # elapsed=0.0 → format_duration(0.0) → '0.0s'
-    assert str(sw) == "0.0s"
+    assert sw.started_at is None
 
 
 def test_context_manager(monkeypatch):
@@ -36,7 +35,27 @@ def test_context_manager(monkeypatch):
     with Stopwatch() as sw:
         clock.advance(90)
     assert sw.elapsed == 90.0
-    assert str(sw) == "1m 30s"
+
+
+def test_context_manager_returns_self(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch()
+    with sw as inner:
+        assert inner is sw
+
+
+def test_context_manager_stops_on_exception(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    sw = Stopwatch()
+    try:
+        with sw:
+            clock.advance(5)
+            raise RuntimeError("boom")
+    except RuntimeError:
+        pass
+    assert sw.elapsed == 5.0
 
 
 def test_manual_start_stop(monkeypatch):
@@ -47,16 +66,6 @@ def test_manual_start_stop(monkeypatch):
     clock.advance(3700)
     sw.stop()
     assert sw.elapsed == 3700.0
-    assert str(sw) == "1h 1m"
-
-
-def test_running_str(monkeypatch):
-    clock = _FakeClock()
-    _patch(monkeypatch, clock)
-    sw = Stopwatch().start()
-    clock.advance(45)
-    # Not stopped yet — should show running elapsed.
-    assert str(sw) == "45.0s"
 
 
 def test_stop_without_start_is_noop(monkeypatch):
@@ -66,3 +75,8 @@ def test_stop_without_start_is_noop(monkeypatch):
     sw.stop()  # no-op
     assert sw.elapsed == 0.0
     assert sw.started_at is None
+
+
+def test_no_str_format_coupling():
+    # v0.2.0: Stopwatch has no __str__ override — uses object default.
+    assert "Stopwatch" in str(Stopwatch())

@@ -84,23 +84,6 @@ def test_reset(monkeypatch):
     assert eta.eta() is None
 
 
-def test_str_none(monkeypatch):
-    _patch(monkeypatch, _FakeClock())
-    eta = ETAEstimator(100)
-    assert str(eta) == "?"
-
-
-def test_str_value(monkeypatch):
-    clock = _FakeClock()
-    _patch(monkeypatch, clock)
-    eta = ETAEstimator(100)
-    eta.update(0)
-    clock.advance(10)
-    eta.update(50)
-    s = str(eta)
-    assert s.endswith("s") or s.endswith("m")
-
-
 def test_zero_elapsed_guard(monkeypatch):
     clock = _FakeClock()
     _patch(monkeypatch, clock)
@@ -122,3 +105,38 @@ def test_negative_progress_no_ema_update(monkeypatch):
     eta.update(60)
     # Should still produce a value via the linear fallback / EMA seeded now.
     assert eta.eta() is not None
+
+
+def test_default_alpha():
+    eta = ETAEstimator(100)
+    assert eta.alpha == 0.3
+
+
+def test_custom_alpha(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    eta = ETAEstimator(100, mode="ema", alpha=0.5)
+    assert eta.alpha == 0.5
+    eta.update(0)
+    clock.advance(1)
+    eta.update(10)  # ema seeded at 10
+    clock.advance(1)
+    eta.update(30)  # inst=20, ema=0.5*20 + 0.5*10 = 15
+    assert eta._ema_rate == pytest.approx(15.0)
+
+
+def test_alpha_one_uses_only_latest(monkeypatch):
+    clock = _FakeClock()
+    _patch(monkeypatch, clock)
+    eta = ETAEstimator(100, mode="ema", alpha=1.0)
+    eta.update(0)
+    clock.advance(1)
+    eta.update(10)  # ema = 10
+    clock.advance(1)
+    eta.update(30)  # alpha=1 → ema = inst = 20
+    assert eta._ema_rate == pytest.approx(20.0)
+
+
+def test_no_str_format_coupling():
+    # v0.2.0: ETAEstimator has no __str__ override.
+    assert "ETAEstimator" in str(ETAEstimator(100))
