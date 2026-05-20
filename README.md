@@ -1,9 +1,14 @@
 ```text
-        .--:--.          c o d e c h u
-       /  12   \           ╔═════════╗
-      |9   ●---3|  meter   ║ 00:42.7 ║   ETA  03:18
-       \   6   /           ╚═════════╝
-        '-----'          ─── tick · tock · tick · tock ───
+━━━━━━━━━━━━ c o d e c h u  ·  m e t e r ━━━━━━━━━━━━
+
+   Stopwatch              with sw:  …  →  sw.elapsed
+   RateEstimator          observe → rate()    1.5 / unit / s
+   ETAEstimator           update  → eta()     ≈ 3m 18s left
+   Counter                inc / dec / reset   thread-safe
+   Histogram              bucketed distribution
+   PercentileEstimator    p50 / p95 / p99 from a stream
+
+━━━ time things without lying about them. ━━━
 ```
 
 [![PyPI](https://img.shields.io/pypi/v/codechu-meter.svg)](https://pypi.org/project/codechu-meter/)
@@ -19,15 +24,6 @@ Stdlib-only measurement primitives. Time things. Estimate rates.
 Predict remaining duration. Track counters, histograms, and
 streaming percentiles when one number is not enough. All numeric
 — formatting is somebody else's problem (see `codechu-fmt`).
-
-| Primitive | What it returns |
-|-----------|-----------------|
-| `Stopwatch` | elapsed seconds (with `with` or `.start()`/`.stop()`) |
-| `RateEstimator` | rolling-window per-second rate |
-| `ETAEstimator` | remaining seconds (linear or EMA) |
-| `Counter` | thread-safe int counter |
-| `Histogram` | bucketed distribution |
-| `PercentileEstimator` | streaming p50 / p95 / p99 |
 
 ## Install
 
