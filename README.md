@@ -123,6 +123,17 @@ pytest -q
 Coverage gate: ≥90 %. Tests drive time via monkeypatching
 `time.monotonic` for deterministic assertions.
 
+## Documentation
+
+- [API reference](docs/API.md) — every public symbol, parameter,
+  return value, and exception.
+- [Migration guide](docs/MIGRATION.md) — 0.1.x → 0.2.0 (breaking
+  `__str__` removal, new `alpha` parameter, dropped `codechu-fmt`
+  dependency).
+- [Recipes](docs/RECIPES.md) — patterns for timing blocks, tracking
+  download speed, computing ETA, tuning EMA `alpha`, and pairing with
+  `codechu-fmt`.
+
 ## License
 
 MIT — see [LICENSE](LICENSE).
